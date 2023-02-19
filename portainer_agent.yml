@@ -1,0 +1,30 @@
+- hosts: all
+  become: true
+  vars:
+    container_count: 4
+    default_container_name: portainer_agent
+    default_container_image: portainer/agent
+    default_container_tag: 2.17.0
+  tasks:
+    - name: Pull default Docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+        tag: "{{default_container_tag}}"
+
+    - name: Create Portainer Agent
+      community.docker.docker_container:
+        name: "{{ default_container_name }}"   # {{ item }}
+        image: "{{ default_container_image }}:{{default_container_tag}}"
+        # command: "{{ default_container_command }}"
+        state: started
+        pull: no #yes
+        recreate: yes
+        detach: yes
+        restart_policy: unless-stopped
+        published_ports:
+          - "9121:9001"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "/var/lib/docker/volumes:/var/lib/docker/volumes"
+      # with_sequence: count={{ container_count }}

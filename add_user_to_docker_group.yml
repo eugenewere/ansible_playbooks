@@ -1,0 +1,23 @@
+- hosts: all
+  become: true
+  tasks:
+    # - name: add user to docker group
+    #   ansible.builtin.user:
+    #     name: "$USER"
+    #     groups: docker
+    #     append: yes      
+    #   ignore_errors: true 
+    - name:  Add your user to the docker group
+      ansible.builtin.shell:
+        cmd: groupadd docker
+      ignore_errors: true
+
+    - name:  Add your user to the docker group
+      ansible.builtin.shell:
+        cmd: usermod -aG docker $USER
+
+    # - name:  activate the changes to groups
+    #   ansible.builtin.shell:
+    #     cmd: newgrp docker
+
+    
