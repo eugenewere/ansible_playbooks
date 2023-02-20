@@ -1,23 +1,18 @@
 - hosts: all
-  become: true
+  vars:
+    non_root_docker_users:
+      - gener
   tasks:
-    # - name: add user to docker group
-    #   ansible.builtin.user:
-    #     name: "$USER"
-    #     groups: docker
-    #     append: yes      
-    #   ignore_errors: true 
-    - name:  Add your user to the docker group
-      ansible.builtin.shell:
-        cmd: groupadd docker
-      ignore_errors: true
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+      become: yes
 
-    - name:  Add your user to the docker group
-      ansible.builtin.shell:
-        cmd: usermod -aG docker $USER
-
-    # - name:  activate the changes to groups
-    #   ansible.builtin.shell:
-    #     cmd: newgrp docker
-
-    
+    - name: Add user to the docker group
+      user:
+        name: "{{ item }}"
+        groups: docker
+        append: yes
+      with_items: "{{ non_root_docker_users }}"
+      become: yes
