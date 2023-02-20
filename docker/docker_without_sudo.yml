@@ -2,6 +2,7 @@
   vars:
     non_root_docker_users:
       - gener
+      
   tasks:
     - name: Create docker group
       group:

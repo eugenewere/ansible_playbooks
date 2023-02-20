@@ -1,0 +1,19 @@
+- hosts: all
+  vars:
+    package: qemu-guest-agent
+  tasks:
+    - name:  Add Qemu Agent
+      apt:
+        name: "{{ package }}"
+        state: latest
+        update_cache: true
+        
+    - name: Enable Ansible 
+      service:
+        name: "{{ package }}"
+        enabled: true
+        state: started
+    # - name:  Add Qemu Agent
+    #   ansible.builtin.shell:
+    #     cmd: groupadd docker
+    #   ignore_errors: true
