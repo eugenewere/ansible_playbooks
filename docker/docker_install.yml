@@ -1,5 +1,8 @@
 - hosts: all
   become: true
+  vars:
+    non_root_docker_users:
+      - gener
   tasks:
     - name: Install aptitude
       apt:
@@ -67,3 +70,16 @@
       pip:
         name: docker
 
+    - name: Create docker group
+      group:
+        name: docker
+        state: present
+      become: yes
+
+    - name: Add user to the docker group
+      user:
+        name: "{{ item }}"
+        groups: docker
+        append: yes
+      with_items: "{{ non_root_docker_users }}"
+      become: yes

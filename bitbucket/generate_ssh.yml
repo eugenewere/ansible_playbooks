@@ -1,0 +1,36 @@
+- name: generate SSH key
+  hosts: all
+  # connection: local
+  vars:
+    ssh_key_filename: bitbucket
+    app_pswd: ATBBseFGhemVAYwbcz59BNEqeQY5BDB5E5D1
+
+  vars_prompt:
+    - name: "ssh_passphrase"
+      prompt: "Enter the passphrase for the SSH key"
+  tasks:
+    - name: generate SSH key "{{ssh_key_filename}}"
+      user:
+        name: gener
+        generate_ssh_key: yes
+        ssh_key_type: rsa
+        ssh_key_bits: 4096
+        ssh_key_file: .ssh/{{ssh_key_filename}}
+        ssh_key_passphrase: "{{ssh_passphrase}}"
+        force: no
+
+
+    # - name: Create access key
+    #   community.general.bitbucket_access_key:
+    #     repository: 'bitbucket-repo'
+    #     workspace: bitbucket_workspace
+    #     key: '{{lookup("file", "bitbucket.pub") }}'
+    #     label: 'Bitbucket'
+    #     state: present
+
+    # - name: Delete access key
+    #   community.general.bitbucket_access_key:
+    #     repository: bitbucket-repo
+    #     workspace: bitbucket_workspace
+    #     label: Bitbucket
+    #     state: absent

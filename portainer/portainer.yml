@@ -1,0 +1,65 @@
+- hosts: all
+  tags: portainer_agent
+  vars:
+    default_container_name: portainer_agent
+    default_container_image: portainer/agent
+    default_container_tag: 2.17.0
+  tasks:
+    - name: Pull default Docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+        tag: "{{default_container_tag}}"
+
+    - name: Create Volumes
+      community.docker.docker_volume:
+        name: portainer_agent
+
+    - name: Create Portainer Agent
+      community.docker.docker_container:
+        name: "{{ default_container_name }}" 
+        image: "portainer/agent:{{default_container_tag}}"
+        state: started
+        pull: no #yes
+        recreate: yes
+        detach: yes
+        restart_policy: unless-stopped
+        published_ports:
+          - "9121:9001"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "portainer_agent:/var/lib/docker/volumes"
+          
+- hosts: gener@monitoring
+  tags: portainer
+  vars:
+    default_container_name: portainer
+    default_container_image: portainer/portainer-ce
+    default_container_tag: 2.17.0
+  tasks:
+    - name: Pull default Docker image
+      community.docker.docker_image:
+        name: "{{ default_container_image }}"
+        source: pull
+        tag: "{{default_container_tag}}"
+
+    - name: Create Volumes
+      community.docker.docker_volume:
+        name: portainer_data
+
+    
+    - name: Create Portainer Agent
+      community.docker.docker_container:
+        image: "portainer/portainer-ce:{{default_container_tag}}"
+        name: "{{ default_container_name }}" 
+        state: started
+        pull: no #yes
+        recreate: yes
+        detach: yes
+        restart_policy: unless-stopped
+        published_ports:
+          - "9443:9443"
+          - "8000:8000"
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+          - "portainer_data:/data"

@@ -2,6 +2,7 @@
   vars:
     non_root_docker_users:
       - gener
+      - docker-compose
       
   tasks:
     - name: Create docker group
@@ -17,3 +18,16 @@
         append: yes
       with_items: "{{ non_root_docker_users }}"
       become: yes
+
+    - name: Add Docker Compose to docker group
+      become: true
+      tags: compose
+      ansible.builtin.shell: |
+        usermod -aG docker $USER
+        chgrp docker /usr/local/bin/docker-compose
+        chmod 750 /usr/local/bin/docker-compose
+      # ignore_errors: true
+
+
+
+    # sudo usermod -aG docker $USER && sudo chgrp docker /usr/local/bin/docker-compose && sudo chmod 750 /usr/local/bin/docker-compose
